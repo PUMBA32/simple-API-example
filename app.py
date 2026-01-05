@@ -2,6 +2,7 @@ import uuid
 
 from fastapi import FastAPI, Body, status
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from typing import Optional
 
@@ -17,7 +18,7 @@ class Person:
 people = [Person('Tyler', 23), Person('Edvard', 20), Person('Mike', 34)]
 
 
-def find_person(id: int) -> Optional[Person]:
+def find_person(id: str) -> Optional[Person]:
     for person in people:
         if person.id == id:
             return person
@@ -27,8 +28,11 @@ def find_person(id: int) -> Optional[Person]:
 app = FastAPI()
 
 
+app.mount('/static', StaticFiles(directory='public'), name='static')
+
+
 @app.get('/')
-async def main():
+def main():
     return FileResponse("public/index.html")
 
 
@@ -38,9 +42,8 @@ def get_people():
 
 
 @app.get('/api/users/{id}')
-def get_person(id: int):
+def get_person(id: str):
     person = find_person(id)
-    print(person)
 
     if person == None:
         return JSONResponse(
@@ -53,7 +56,7 @@ def get_person(id: int):
 
 @app.post('/api/users')
 def create_person(data = Body()):
-    person = Person(data['name', data['age']])
+    person = Person(data['name'], data['age'])
     people.append(person)
    
     return person
@@ -71,12 +74,12 @@ def edit_person(data = Body()):
     
     person.age = data['age']
     person.name = data['name']
-   
+
     return person
 
 
 @app.delete('/api/users/{id}')
-def delete_person(id: int):
+def delete_person(id: str):
     person = find_person(id)
 
     if person == None:

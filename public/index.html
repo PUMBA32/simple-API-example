@@ -4,8 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+    td {padding:5px;}
+    button{margin: 5px;}
+    </style>
 </head>
 <body>
-    
+    <h2>Список пользователей</h2>
+    <div>
+        <input type="hidden" id="userId">
+        <p>Имя: <input id="userName"></p>
+        <p>Возраст: <input id="userAge" type="number"></p>
+        <p>
+            <button id="saveBtn">Сохранить</button>
+            <button id="resetBtn">Сбросить</button>
+        </p>
+    </div>
+    <table>
+        <thead><tr><th>Имя</th><th>Возраст</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="/static/script.js"></script>
 </body>
 </html>
