@@ -7,19 +7,34 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
 
-# Создание таблицы
+'''
+Эта строка, говоря простым языком, создает таблицу в БД для каждой модели, 
+унаследовавшей Base. engine содержит настройки подключения, то-есть
+мы показываем где именно создавать таблицы, в какой БД 
+'''
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+'''
+Эта часть "монтирует" статические файлы (html, css, JS) к приложению.
+/static - URL интерфейс по котором будут доступны файлы
+StaticFiles указывает, что файлы лежат в директории public
+name='static' - внутреннее имя для "монтирования"
+'''
 app.mount('/static', StaticFiles(directory='public'), name='static')
 
-# определение зависимости
+
+
+'''
+функция отдает сессию с базой данных эндпоинту, 
+дождется пока эндпоинт завершится и закроет db
+'''
 def get_db():
     db = SessionLocal()
     try:
         yield db
-    except:
+    finally:
         db.close()
 
 
@@ -29,12 +44,13 @@ def main():
 
 
 @app.get('/api/users')
-def get_people(db: Session = Depends(get_db)):
-    return db.query(Person).all()
+def get_people(db: Session = Depends(get_db)):  # Depends внедряет механизм зависимостей (Dependency Injection)
+    return db.query(Person).all()  # получение всех пользователей из базы данных
 
 
 @app.get("/api/users/{id}")
 def get_person(id, db: Session = Depends(get_db)):
+    # получение конкретного пользователя по его id
     person = db.query(Person).filter(Person.id == id).first()
 
     if person == None:
